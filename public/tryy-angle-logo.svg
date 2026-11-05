@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 100">
+  <rect width="540" height="100" fill="none"/>
+  <text x="0" y="72" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="900" letter-spacing="-7" fill="#f5f1e8">TRYy</text>
+  <text x="205" y="72" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="900" letter-spacing="-7" fill="#f5f1e8">ANGLE</text>
+  <path d="M206 84H522" stroke="#d5ff3f" stroke-width="5"/>
+</svg>
