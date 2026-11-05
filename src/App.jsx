@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDownRight, ArrowRight, ArrowUpRight, Bag, Check, ChevronDown, ChevronLeft,
+  ArrowDownRight, ArrowRight, ArrowUpRight, ShoppingBag, Check, ChevronDown, ChevronLeft,
   ChevronRight, CircleUserRound, Clock3, Instagram, Menu, Minus, Package,
   Plus, Search, ShieldCheck, SlidersHorizontal, Truck, X, Zap
 } from "lucide-react";
@@ -44,7 +44,7 @@ function Header({ count, onCart, onSearch, onAdmin }) {
       <div className="header-actions">
         <button className="icon-btn" onClick={onSearch} aria-label="Search"><Search /></button>
         <button className="icon-btn admin-shortcut" onClick={onAdmin} aria-label="Admin"><ShieldCheck /></button>
-        <button className="bag-btn" onClick={onCart}><Bag size={17}/> <span>BAG</span><b>{count}</b></button>
+        <button className="bag-btn" onClick={onCart}><ShoppingBag size={17}/> <span>BAG</span><b>{count}</b></button>
       </div>
     </header>
   </>;
@@ -94,7 +94,7 @@ function CartDrawer({ cart, onClose, onChange, onCheckout }) {
     <motion.aside className="cart-drawer" initial={{x:"100%"}} animate={{x:0}} exit={{x:"100%"}} transition={{type:"spring",damping:28}} onMouseDown={e=>e.stopPropagation()}>
       <div className="drawer-head"><div><span className="eyebrow">YOUR SELECTION</span><h2>Shopping bag <small>({cart.reduce((s,x)=>s+x.qty,0)})</small></h2></div><button className="icon-btn" onClick={onClose}><X/></button></div>
       <div className="cart-items">
-        {cart.length===0?<div className="empty-state"><Bag size={36}/><h3>Your bag is waiting.</h3><p>Find something that feels like you.</p></div>:cart.map(item=><div className="cart-line" key={`${item.id}-${item.size}-${item.color}`}>
+        {cart.length===0?<div className="empty-state"><ShoppingBag size={36}/><h3>Your bag is waiting.</h3><p>Find something that feels like you.</p></div>:cart.map(item=><div className="cart-line" key={`${item.id}-${item.size}-${item.color}`}>
           <img src={item.image} alt={item.name}/><div className="cart-line-info"><h3>{item.name}</h3><p>{item.color} / {item.size}</p><b>{money(item.price)}</b><div className="qty"><button onClick={()=>onChange(item,-1)}><Minus size={13}/></button><span>{item.qty}</span><button onClick={()=>onChange(item,1)}><Plus size={13}/></button></div></div>
           <button className="remove" onClick={()=>onChange(item,-item.qty)}>REMOVE</button>
         </div>)}
@@ -140,7 +140,7 @@ function AdminPanel({ orders, setOrders, products, setProducts, onExit }) {
   if(!adminLogged)return <div className="admin-login"><form onSubmit={signIn}><span className="eyebrow">TRYy ANGLE / PRIVATE ACCESS</span><h2>Admin sign in</h2><p>Sign in with an account assigned the admin role.</p><label>EMAIL<input type="email" required value={login.email} onChange={e=>setLogin({...login,email:e.target.value})}/></label><label>PASSWORD<input type="password" required value={login.password} onChange={e=>setLogin({...login,password:e.target.value})}/></label>{authError&&<p className="error">{authError}</p>}<button className="primary-btn full">SIGN IN <ArrowRight size={16}/></button></form></div>;
   const filtered=orders.filter(o=>`${o.id} ${o.customer?.name} ${o.customer?.phone}`.toLowerCase().includes(search.toLowerCase()));
   return <div className="admin-shell">
-    <aside className="admin-sidebar"><a className="wordmark" href="#home"><img src="/tryy-angle-logo.svg" alt="TRYy ANGLE"/></a><span className="admin-label">CONTROL CENTRE</span>{[["orders","Orders",Package],["products","Products",Bag],["shipping","Shipping desk",Truck]].map(([key,label,Icon])=><button key={key} className={tab===key?"admin-nav active":"admin-nav"} onClick={()=>setTab(key)}><Icon size={17}/>{label}{key==="orders"&&<b>{orders.filter(o=>o.status!=="Delivered").length}</b>}</button>)}<button className="admin-exit" onClick={onExit}>← BACK TO STORE</button></aside>
+    <aside className="admin-sidebar"><a className="wordmark" href="#home"><img src="/tryy-angle-logo.svg" alt="TRYy ANGLE"/></a><span className="admin-label">CONTROL CENTRE</span>{[["orders","Orders",Package],["products","Products",ShoppingBag],["shipping","Shipping desk",Truck]].map(([key,label,Icon])=><button key={key} className={tab===key?"admin-nav active":"admin-nav"} onClick={()=>setTab(key)}><Icon size={17}/>{label}{key==="orders"&&<b>{orders.filter(o=>o.status!=="Delivered").length}</b>}</button>)}<button className="admin-exit" onClick={onExit}>← BACK TO STORE</button></aside>
     <main className="admin-main"><div className="admin-top"><div><span className="eyebrow">TRYy ANGLE / ADMIN</span><h1>{tab==="orders"?"Orders":tab==="products"?"Products":"Shipping desk"}</h1></div><span className="live-pill"><i/> {isConnected?"CONNECTED":"DEMO MODE"}</span></div>
       <div className="admin-stats"><div><span>TOTAL ORDERS</span><b>{orders.length}</b></div><div><span>TO PROCESS</span><b>{orders.filter(o=>!["Delivered","Cancelled"].includes(o.status)).length}</b></div><div><span>REVENUE</span><b>{money(orders.filter(o=>o.status!=="Cancelled").reduce((s,o)=>s+o.total,0))}</b></div><div><span>PRODUCTS</span><b>{products.length}</b></div></div>
       {tab==="orders"&&<><div className="admin-toolbar"><h2>All orders <small>({orders.length})</small></h2><input placeholder="Search order, name or phone…" value={search} onChange={e=>setSearch(e.target.value)}/></div><div className="admin-table-wrap"><table><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>DATE</th><th>ITEMS</th><th>TOTAL</th><th>STATUS</th><th></th></tr></thead><tbody>{filtered.map(o=><tr key={o.id}><td><b>#{o.id}</b></td><td>{o.customer?.name}<small>{o.customer?.phone}</small></td><td>{new Date(o.createdAt).toLocaleDateString("en-IN")}</td><td>{o.items?.reduce((s,x)=>s+x.qty,0)||0}</td><td><b>{money(o.total)}</b></td><td><span className={`status ${o.status?.toLowerCase().replaceAll(" ","-")}`}>{o.status}</span></td><td><button className="table-action" onClick={()=>{setSelected(o);setEdit({...o});}}>VIEW / UPDATE ↗</button></td></tr>)}</tbody></table>{filtered.length===0&&<div className="empty-admin">No orders yet. New customer orders will appear here.</div>}</div></>}
